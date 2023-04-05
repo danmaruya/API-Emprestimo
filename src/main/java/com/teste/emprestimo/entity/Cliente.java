@@ -1,12 +1,12 @@
 package com.teste.emprestimo.entity;
 
-import com.teste.emprestimo.messages.Mensagem;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Set;
 
@@ -14,15 +14,17 @@ import java.util.Set;
 @Table(name = "CLIENTE")
 public class Cliente {
     @Id
-    @NotBlank(message = "Preencha o CPF com 11 digitos")
+    @NotBlank(message = "Preencha o CPF com 11 digitos, sem pontos e hifen")
     @Size(max = 11, min = 11, message = "O CPF deve conter 11 digitos")
     private String cpf;
     private String nome;
     @NotBlank(message = "Preencha o telefone com 11 digitos")
-    @Size(max = 11, min = 11, message = "O telefone deve conter 11 digitos")
+    @Size(max = 11, min = 10, message = "O telefone deve conter no maximo 11 digitos. Colcoar somente numeros")
     private String telefone;
     @Digits(integer = 10, fraction = 4, message = "Deve conter no maximo 10 digitos")
+    @NotNull(message = "Este campo nao pode ser em branco")
     private BigDecimal rendimentoMensal;
+    @Valid
     @Embedded
     private Endereco endereco;
     @OneToMany(cascade = CascadeType.ALL)

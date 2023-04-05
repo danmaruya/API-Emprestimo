@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,32 +22,42 @@ public class EmprestimoService {
     @Autowired
     public EmprestimoService(EmprestimoRepository emprestimoRepository) { this.emprestimoRepository = emprestimoRepository; }
 
+    public static int getQuantidadeEmprestimos() {
+        return quantidadeEmprestimos;
+    }
+
     @Autowired
     public void ClienteService(ClienteRepository clienteRepository) { this.clienteRepository = clienteRepository; }
 
+    static int quantidadeEmprestimos = 0;
+
     public Mensagem cadastrarEmprestimo (Emprestimo emprestimo) {
-        Mensagem mensagem = new Mensagem();
+        Mensagem resultadoCadastroEmprestimo = new Mensagem();
 
         Optional<Cliente> cliente = this.clienteRepository.findById(emprestimo.getCpfCliente());
         List<Emprestimo> emprestimos = emprestimoRepository.findByCpfCliente(emprestimo.getCpfCliente());
-        BigDecimal somaValorInicial = new BigDecimal(0);
+        BigDecimal valorTotalEmprestimoAnteriores = new BigDecimal(0);
+
         if (!cliente.isEmpty()) {
             for (Emprestimo item : emprestimos) {
-                somaValorInicial = somaValorInicial.add(item.getValorInicial());
+                valorTotalEmprestimoAnteriores = valorTotalEmprestimoAnteriores.add(item.getValorInicial());
             }
-            somaValorInicial = somaValorInicial.add(emprestimo.getValorInicial());
+
+            valorTotalEmprestimoAnteriores = valorTotalEmprestimoAnteriores.add(emprestimo.getValorInicial());
             BigDecimal rendimentoMensal = cliente.get().getRendimentoMensal().multiply(new BigDecimal(10));
-            if (rendimentoMensal.compareTo(somaValorInicial) >= 0) {
+            if (rendimentoMensal.compareTo(valorTotalEmprestimoAnteriores) >= 0) {
+                quantidadeEmprestimos = emprestimos.size();
+                emprestimo.setValorFinal();
                 this.emprestimoRepository.save(emprestimo);
-                mensagem.setMensagem("Emprestimo cadastrado");
-                return mensagem;
+                resultadoCadastroEmprestimo.setMensagem("Emprestimo cadastrado");
+                return resultadoCadastroEmprestimo;
             } else {
-                mensagem.setMensagem("Voce nao possui margem para emprestimo");
-                return mensagem;
+                resultadoCadastroEmprestimo.setMensagem("Voce nao possui margem para emprestimo");
+                return resultadoCadastroEmprestimo;
             }
         }
-        mensagem.setMensagem("Cliente nao cadastrado");
-        return mensagem;
+        resultadoCadastroEmprestimo.setMensagem("Cliente nao cadastrado. Por favor, faca o cadastro do cliente");
+        return resultadoCadastroEmprestimo;
     }
 
     public Mensagem deletarEmprestimo (Long id) throws EmprestimoNotFoundException {
@@ -68,7 +77,8 @@ public class EmprestimoService {
         throw new EmprestimoNotFoundException(id);
     }
 
-    public List<Emprestimo> retornarTodosOsEmprestimos() {
-        return this.emprestimoRepository.findAll();
+    public List<Emprestimo> retornarTodosOsEmprestimosDoCliente(Emprestimo emprestimo) {
+        List<Emprestimo> emprestimos = emprestimoRepository.findByCpfCliente(emprestimo.getCpfCliente());
+        return emprestimos;
     }
 }

@@ -1,6 +1,10 @@
 package com.teste.emprestimo.entity;
 
+import com.teste.emprestimo.enums.Relacionamento;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 
@@ -11,22 +15,25 @@ public class Emprestimo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String cpfCliente;
+    @Digits(integer = 10, fraction = 4, message = "Deve conter no maximo 10 digitos")
+    @NotNull(message = "Este campo nao pode ser em branco")
     private BigDecimal valorInicial;
     private BigDecimal valorFinal;
-//    private enum Relacionamento
+    private Relacionamento relacionamento;
     private String dataInicial;
     private String dataFinal;
 
     public Emprestimo() {
     }
 
-    public Emprestimo(long id, String cpfCliente, BigDecimal valorInicial, BigDecimal valorFinal, String dataInicial, String dataFinal) {
+    public Emprestimo(long id, String cpfCliente, BigDecimal valorInicial, BigDecimal valorFinal, String dataInicial, String dataFinal, Relacionamento relacionamento) {
         this.id = id;
         this.cpfCliente = cpfCliente;
         this.valorInicial = valorInicial;
         this.valorFinal = valorFinal;
         this.dataInicial = dataInicial;
         this.dataFinal = dataFinal;
+        this.relacionamento = relacionamento;
     }
 
     public long getId() {
@@ -57,8 +64,8 @@ public class Emprestimo {
         return valorFinal;
     }
 
-    public void setValorFinal(BigDecimal valorFinal) {
-        this.valorFinal = valorFinal;
+    public void setValorFinal() {
+        this.valorFinal = this.relacionamento.calculaValorFinalEmprestimo(valorInicial);
     }
 
     public String getDataInicial() {
@@ -77,4 +84,11 @@ public class Emprestimo {
         this.dataFinal = dataFinal;
     }
 
+    public Relacionamento getRelacionamento() {
+        return relacionamento;
+    }
+
+    public void setRelacionamento(Relacionamento relacionamento) {
+        this.relacionamento = relacionamento;
+    }
 }

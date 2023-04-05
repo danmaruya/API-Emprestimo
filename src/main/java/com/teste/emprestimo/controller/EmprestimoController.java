@@ -43,7 +43,7 @@ public class EmprestimoController {
     }
 
     @GetMapping
-    public List<Emprestimo> retornarTodosOsEmprestimos() {
-        return this.emprestimoService.retornarTodosOsEmprestimos();
+    public List<Emprestimo> retornarTodosOsEmprestimosDoCliente(Emprestimo emprestimo) {
+        return this.emprestimoService.retornarTodosOsEmprestimosDoCliente(emprestimo);
     }
 }
