@@ -1,0 +1,48 @@
+package com.teste.emprestimo.controller;
+
+import com.teste.emprestimo.entity.Cliente;
+import com.teste.emprestimo.exception.ClienteNotFoundException;
+import com.teste.emprestimo.messages.Mensagem;
+import com.teste.emprestimo.service.ClienteService;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/clientes")
+public class ClienteController {
+    private ClienteService clienteService;
+
+    @Autowired
+    public ClienteController(ClienteService clienteService) { this.clienteService = clienteService; }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public Cliente cadastrarCliente(@Valid @RequestBody Cliente cliente) {
+        return this.clienteService.cadastrarCliente(cliente);
+    }
+
+    @GetMapping
+    public List<Cliente> retornarTodosOsClientes() {
+        return this.clienteService.retornarTodosOsClientes();
+    }
+
+    @GetMapping("/{cpf}")
+    public Cliente retornarClientePorCpf(@PathVariable String cpf) throws ClienteNotFoundException {
+        return this.clienteService.retornarClientePorCpf(cpf);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @DeleteMapping("/{cpf}")
+    public Mensagem deletarCliente(@PathVariable String cpf) throws ClienteNotFoundException {
+        return this.clienteService.deletarCliente(cpf);
+    }
+
+    @PutMapping("/{cpf}")
+    public Cliente alterarCliente(@PathVariable String cpf, @Valid @RequestBody Cliente cliente) throws ClienteNotFoundException {
+        return this.clienteService.alterarCliente(cliente, cpf);
+    }
+}
