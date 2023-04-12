@@ -9,10 +9,10 @@ public class Endereco {
     @Size(max = 50, min = 5)
     private String rua;
     @NotBlank(message = "O numero nao deve ficar em branco")
-    @Size(min = 1, message = "Deve conter no maximo 9 digitos")
+    @Size(min = 1, message = "Numero deve conter no maximo 9 digitos")
     private String numero;
     @NotBlank(message = "O CEP nao deve ficar em branco")
-    @Size(min = 8, max = 9, message = "Deve conter no maximo 9 digitos")
+    @Size(min = 8, max = 9, message = "CEP deve conter no maximo 9 digitos")
     private String cep;
 
     public Endereco() {

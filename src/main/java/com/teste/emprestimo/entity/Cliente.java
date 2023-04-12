@@ -19,10 +19,10 @@ public class Cliente {
     private String cpf;
     private String nome;
     @NotBlank(message = "Preencha o telefone com 11 digitos")
-    @Size(max = 11, min = 10, message = "O telefone deve conter no maximo 11 digitos. Colcoar somente numeros")
+    @Size(max = 11, min = 10, message = "O telefone deve conter no maximo 11 digitos. Colocar somente numeros")
     private String telefone;
     @Digits(integer = 10, fraction = 4, message = "Deve conter no maximo 10 digitos")
-    @NotNull(message = "Este campo nao pode ser em branco")
+    @NotNull(message = "O campo Rendimento Mensal nao pode ser em branco")
     private BigDecimal rendimentoMensal;
     @Valid
     @Embedded
@@ -46,8 +46,12 @@ public class Cliente {
         return cpf;
     }
 
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
+    public void setCpf(String cpf) throws IllegalArgumentException {
+        if (this.cpf == null) {
+            this.cpf = cpf;
+        } else if (!this.cpf.equals(cpf)) {
+            throw new IllegalArgumentException("O CPF não pode ser alterado");
+        }
     }
 
     public String getNome() {

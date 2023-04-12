@@ -19,7 +19,7 @@ public enum Relacionamento {
     Prata(2) {
         @Override
         public BigDecimal calculaValorFinalEmprestimo(BigDecimal valorEmprestimo) {
-            if (valorEmprestimo.compareTo(new BigDecimal(5000)) <= 0) {
+            if (valorEmprestimo.compareTo(new BigDecimal(5000)) <= 0) { //criar uma constante para substituir o 5k
                 BigDecimal fatorMultiplicador = new BigDecimal(1.6);
                 return valorEmprestimo.multiply(fatorMultiplicador, MathContext.DECIMAL32);
             } else {
