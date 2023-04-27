@@ -1,11 +1,13 @@
 package com.teste.emprestimo.entity;
 
 import com.teste.emprestimo.enums.Relacionamento;
+import com.teste.emprestimo.service.EmprestimoService;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 
 @Entity
 @Table(name = "EMPRESTIMO")
@@ -90,4 +92,25 @@ public class Emprestimo {
     public void setRelacionamento(Relacionamento relacionamento) {
         this.relacionamento = relacionamento;
     }
+
+    public BigDecimal relacionamentoPrata(BigDecimal valorEmprestimo) {
+        if (valorEmprestimo.compareTo(new BigDecimal(5000)) <= 0) { //criar uma constante para substituir o 5k
+            BigDecimal fatorMultiplicador = new BigDecimal(1.6);
+            return valorEmprestimo.multiply(fatorMultiplicador, MathContext.DECIMAL32);
+        } else {
+            BigDecimal fatorMultiplicador = new BigDecimal(1.4);
+            return valorEmprestimo.multiply(fatorMultiplicador, MathContext.DECIMAL32);
+        }
+    }
+
+    public BigDecimal relacionamentoOuro(BigDecimal valorEmprestimo) {
+        if (EmprestimoService.getQuantidadeEmprestimos() == 0) {
+            BigDecimal fatorMultiplicador = new BigDecimal(1.2);
+            return valorEmprestimo.multiply(fatorMultiplicador, MathContext.DECIMAL32);
+        } else {
+            BigDecimal fatorMultiplicador = new BigDecimal(1.3);
+            return valorEmprestimo.multiply(fatorMultiplicador, MathContext.DECIMAL32);
+        }
+    }
+
 }

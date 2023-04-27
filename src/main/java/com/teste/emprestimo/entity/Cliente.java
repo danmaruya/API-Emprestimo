@@ -90,6 +90,13 @@ public class Cliente {
         return emprestimos;
     }
 
+    public int getQuantidadeEmprestimos() {
+        if (emprestimos != null) {
+            return this.emprestimos.size();
+        }
+        return 0;
+    }
+
     public void setEmprestimos(Set<Emprestimo> emprestimos) {
         this.emprestimos = emprestimos;
     }

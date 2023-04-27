@@ -55,4 +55,5 @@ public class ClienteController {
     public Cliente alterarCliente(@PathVariable String cpf, @Valid @RequestBody Cliente cliente) throws BadRequestException, ClienteNotFoundException {
         return this.clienteService.alterarCliente(cliente, cpf);
     }
+
 }

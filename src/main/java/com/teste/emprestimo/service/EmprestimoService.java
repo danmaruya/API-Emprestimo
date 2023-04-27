@@ -28,6 +28,8 @@ public class EmprestimoService {
 
     private static int quantidadeEmprestimos = 0;
 
+    private BigDecimal rendimentoMensal;
+
     public static int getQuantidadeEmprestimos() {
         return quantidadeEmprestimos;
     }
@@ -42,29 +44,39 @@ public class EmprestimoService {
         Mensagem resultadoCadastroEmprestimo = new Mensagem();
 
         Optional<Cliente> cliente = this.clienteRepository.findById(emprestimo.getCpfCliente());
-        List<Emprestimo> emprestimos = emprestimoRepository.findByCpfCliente(emprestimo.getCpfCliente());
-        BigDecimal valorTotalEmprestimoAnteriores = new BigDecimal(0);
 
-        if (!cliente.isEmpty()) {
-            for (Emprestimo item : emprestimos) {
-                valorTotalEmprestimoAnteriores = valorTotalEmprestimoAnteriores.add(item.getValorInicial());
-            }
-
-            valorTotalEmprestimoAnteriores = valorTotalEmprestimoAnteriores.add(emprestimo.getValorInicial());
-            BigDecimal rendimentoMensal = cliente.get().getRendimentoMensal().multiply(new BigDecimal(10));
-            if (rendimentoMensal.compareTo(valorTotalEmprestimoAnteriores) >= 0) {
-                quantidadeEmprestimos = emprestimos.size();
+        if (cliente.isPresent()) {
+            this.rendimentoMensal = cliente.get().getRendimentoMensal();
+            boolean elegivel = verificarElegibilidadeClienteEmprestimo(emprestimo, rendimentoMensal);
+            if (elegivel) {
                 emprestimo.setValorFinal();
                 this.emprestimoRepository.save(emprestimo);
                 resultadoCadastroEmprestimo.setMensagem("Emprestimo cadastrado");
-                return resultadoCadastroEmprestimo;
             } else {
                 resultadoCadastroEmprestimo.setMensagem("Voce nao possui margem para emprestimo");
-                return resultadoCadastroEmprestimo;
             }
+        } else {
+            resultadoCadastroEmprestimo.setMensagem("Cliente nao cadastrado. Por favor, faca o cadastro do cliente");
         }
-        resultadoCadastroEmprestimo.setMensagem("Cliente nao cadastrado. Por favor, faca o cadastro do cliente");
         return resultadoCadastroEmprestimo;
+    }
+
+    private boolean verificarElegibilidadeClienteEmprestimo(Emprestimo emprestimo, BigDecimal rendimentoMensal) {
+        List<Emprestimo> emprestimos = emprestimoRepository.findByCpfCliente(emprestimo.getCpfCliente());
+        BigDecimal valorTotalEmprestimoAnteriores = BigDecimal.ZERO;
+        for (Emprestimo item : emprestimos) {
+            valorTotalEmprestimoAnteriores = valorTotalEmprestimoAnteriores.add(item.getValorInicial());
+        }
+        valorTotalEmprestimoAnteriores = valorTotalEmprestimoAnteriores.add(emprestimo.getValorInicial());
+        this.rendimentoMensal = rendimentoMensal.multiply(new BigDecimal(10));
+        if (this.rendimentoMensal.compareTo(valorTotalEmprestimoAnteriores) >= 0) {
+            quantidadeEmprestimos = emprestimos.size();
+            emprestimo.setValorFinal();
+            this.emprestimoRepository.save(emprestimo);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public Mensagem deletarEmprestimo (Long id) throws EmprestimoNotFoundException {
